@@ -38,7 +38,10 @@ class ReleaseHelperGroup(click.Group):
 
         orig_dir = os.getcwd()
 
-        if cmd_name.replace("-", "_") in self._needs_checkout_dir and "--skip-prepare-git" not in ctx.args:
+        if (
+            cmd_name.replace("-", "_") in self._needs_checkout_dir
+            and "--skip-prepare-git" not in ctx.args
+        ):
             if not osp.exists(util.CHECKOUT_NAME):
                 msg = "Please run prep-git first"
                 raise ValueError(msg)
@@ -221,7 +224,7 @@ skip_prepare_git_option: t.Any = [
     click.option(
         "--skip-prepare-git",
         is_flag=True,
-        help='Skip step `prepare-git` check.',
+        help="Skip step `prepare-git` check.",
     )
 ]
 
@@ -351,6 +354,7 @@ def add_options(options):
 
 def use_checkout_dir():
     """Use the checkout dir created by prep-git"""
+
     def inner(func):
         ReleaseHelperGroup._needs_checkout_dir[func.__name__] = True
         return func
@@ -474,7 +478,7 @@ def draft_changelog(
 @add_options(python_packages_options)
 @add_options(skip_prepare_git_option)
 @use_checkout_dir()
-def build_python(dist_dir, python_packages, skip_prepare_git: bool):
+def build_python(dist_dir, python_packages, skip_prepare_git):  # noqa: ARG001
     """Build Python dist files"""
     prev_dir = os.getcwd()
     clean = True
