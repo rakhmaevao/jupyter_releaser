@@ -38,7 +38,7 @@ class ReleaseHelperGroup(click.Group):
 
         orig_dir = os.getcwd()
 
-        if cmd_name.replace("-", "_") in self._needs_checkout_dir:
+        if cmd_name.replace("-", "_") in self._needs_checkout_dir and "--skip-prepare-git" not in ctx.args:
             if not osp.exists(util.CHECKOUT_NAME):
                 msg = "Please run prep-git first"
                 raise ValueError(msg)
@@ -214,6 +214,14 @@ python_packages_options: t.Any = [
         default=["."],
         multiple=True,
         help='The list of strings of the form "path_to_package:name_of_package"',
+    )
+]
+
+skip_prepare_git_option: t.Any = [
+    click.option(
+        "--skip-prepare-git",
+        is_flag=True,
+        help='Skip step `prepare-git` check.',
     )
 ]
 
@@ -464,8 +472,9 @@ def draft_changelog(
 @main.command()
 @add_options(dist_dir_options)
 @add_options(python_packages_options)
+@add_options(skip_prepare_git_option)
 @use_checkout_dir()
-def build_python(dist_dir, python_packages):
+def build_python(dist_dir, python_packages, skip_prepare_git: bool):
     """Build Python dist files"""
     prev_dir = os.getcwd()
     clean = True
